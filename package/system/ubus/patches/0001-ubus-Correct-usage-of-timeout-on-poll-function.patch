@@ -1,0 +1,45 @@
+From 1e8b979fb967f73551cd438261af8b1ee5639360 Mon Sep 17 00:00:00 2001
+From: Karl Vogel <karl.vogel@gmail.com>
+Date: Mon, 7 Dec 2015 08:35:52 +0100
+Subject: [PATCH 1/4] ubus: Correct usage of timeout on poll function
+
+As the man page explains:
+
+"Specifying a timeout of zero causes poll() to return immediately,
+even if no file descriptors are ready."
+
+The use of 0 as timeout could cause libubus to busy loop if the
+socket was non-blocking. For blocking sockets, this was less
+apparent as the subsequent read() would then block.
+
+Signed-off-by: Karl Vogel <karl.vogel@gmail.com>
+(cherry picked from commit f09d18878b09d7d6c1ca7ef7da51131f46ddb2c6)
+---
+ libubus-io.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libubus-io.c b/libubus-io.c
+index 9d3ac6c..e6d4236 100644
+--- a/libubus-io.c
++++ b/libubus-io.c
+@@ -54,7 +54,7 @@ static void wait_data(int fd, bool write)
+ 	struct pollfd pfd = { .fd = fd };
+ 
+ 	pfd.events = write ? POLLOUT : POLLIN;
+-	poll(&pfd, 1, 0);
++	poll(&pfd, 1, -1);
+ }
+ 
+ static int writev_retry(int fd, struct iovec *iov, int iov_len, int sock_fd)
+@@ -321,7 +321,7 @@ void __hidden ubus_poll_data(struct ubus_context *ctx, int timeout)
+ 		.events = POLLIN | POLLERR,
+ 	};
+ 
+-	poll(&pfd, 1, timeout);
++	poll(&pfd, 1, timeout ? timeout : -1);
+ 	ubus_handle_data(&ctx->sock, ULOOP_READ);
+ }
+ 
+-- 
+2.17.1
+
