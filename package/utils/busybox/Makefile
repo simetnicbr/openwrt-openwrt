@@ -112,6 +112,9 @@ define Package/busybox/install
 	$(INSTALL_BIN) ./files/cron $(1)/etc/init.d/cron
 	$(INSTALL_BIN) ./files/sysntpd $(1)/etc/init.d/sysntpd
 	$(INSTALL_BIN) ./files/ntpd-hotplug $(1)/usr/sbin/ntpd-hotplug
+ifneq ($(CONFIG_BUSYBOX_$(BUSYBOX_SYM)_FEATURE_SUID),)
+	chmod u+s $(1)/bin/busybox
+endif
 	-rm -rf $(1)/lib64
 endef
 
