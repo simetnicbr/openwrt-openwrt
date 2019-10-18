@@ -1,0 +1,23 @@
+exec: close stdout and stderr streams on child signal
+
+This prevents timing out ubus call when the child invokes further detached
+childs inheriting stdio descriptors.
+
+Signed-off-by: Jo-Philipp Wich <jo@mein.io>
+(backported from commit 10f787881da2dc6aac261a2ee3b5eedc0f8b5b54)
+
+--- a/exec.c
++++ b/exec.c
+@@ -175,6 +175,12 @@ rpc_exec_process_cb(struct uloop_process *p, int stat)
+ 
+ 	ustream_poll(&c->opipe.stream);
+ 	ustream_poll(&c->epipe.stream);
++
++	close(c->opipe.fd.fd);
++	close(c->epipe.fd.fd);
++
++	ustream_poll(&c->opipe.stream);
++	ustream_poll(&c->epipe.stream);
+ }
+ 
+ static void
