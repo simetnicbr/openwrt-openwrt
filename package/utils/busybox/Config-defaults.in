@@ -102,7 +102,7 @@ config BUSYBOX_DEFAULT_PID_FILE_PATH
 	default "/var/run"
 config BUSYBOX_DEFAULT_FEATURE_SUID
 	bool
-	default y
+	default n
 config BUSYBOX_DEFAULT_FEATURE_SUID_CONFIG
 	bool
 	default n
