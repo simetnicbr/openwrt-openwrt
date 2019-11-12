@@ -1,0 +1,57 @@
+From c45d0aca51eb634440fa63c785ab7bb68201967f Mon Sep 17 00:00:00 2001
+From: Michal Sojka <sojkam1@fel.cvut.cz>
+Date: Thu, 6 Jul 2017 22:25:16 +0200
+Subject: [PATCH 4/5] procd: Do not leak pipe file descriptors to children
+
+Without this change, a process started by procd can have access to
+stdout/err of processes started by procd before.
+
+Signed-off-by: Michal Sojka <sojkam1@fel.cvut.cz>
+(cherry picked from commit f062b305b5ea2c77bb8286f8982f08e4c5b133ae)
+---
+ rcS.c              | 3 +++
+ service/instance.c | 2 ++
+ 2 files changed, 5 insertions(+)
+
+diff --git a/rcS.c b/rcS.c
+index b3e3c22..5ae8773 100644
+--- a/rcS.c
++++ b/rcS.c
+@@ -22,6 +22,8 @@
+ #include <stdio.h>
+ #include <unistd.h>
+ 
++#include <fcntl.h>
++
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <glob.h>
+@@ -80,6 +82,7 @@ static void q_initd_run(struct runqueue *q, struct runqueue_task *t)
+ 
+ 	if (pid) {
+ 		close(pipefd[1]);
++		fcntl(pipefd[0], F_SETFD, FD_CLOEXEC);
+ 		s->fd.stream.string_data = true,
+ 		s->fd.stream.notify_read = pipe_cb,
+ 		runqueue_process_add(q, &s->proc, pid);
+diff --git a/service/instance.c b/service/instance.c
+index 40ff021..6ef9c07 100644
+--- a/service/instance.c
++++ b/service/instance.c
+@@ -376,11 +376,13 @@ instance_start(struct service_instance *in)
+ 	if (opipe[0] > -1) {
+ 		ustream_fd_init(&in->_stdout, opipe[0]);
+ 		closefd(opipe[1]);
++		fcntl(opipe[0], F_SETFD, FD_CLOEXEC);
+ 	}
+ 
+ 	if (epipe[0] > -1) {
+ 		ustream_fd_init(&in->_stderr, epipe[0]);
+ 		closefd(epipe[1]);
++		fcntl(epipe[0], F_SETFD, FD_CLOEXEC);
+ 	}
+ 
+ 	service_event("instance.start", in->srv->name, in->name);
+-- 
+2.17.1
+
