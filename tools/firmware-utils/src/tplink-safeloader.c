@@ -633,7 +633,7 @@ static struct device_info boards[] = {
 			"{product_name:Archer C7,product_ver:5.0.0,special_id:54570000}\n",
 
 		.support_trail = '\x00',
-		.soft_ver = "soft_ver:1.0.0\n",
+		.soft_ver = "soft_ver:1.9.1\n",
 
 		/**
 		  We use a bigger os-image partition than the stock images (and thus
