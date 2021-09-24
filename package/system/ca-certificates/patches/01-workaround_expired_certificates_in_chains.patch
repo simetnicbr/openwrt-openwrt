@@ -1,0 +1,11 @@
+--- a/work/mozilla/blacklist.txt
++++ b/work/mozilla/blacklist.txt
+@@ -7,3 +7,8 @@
+ "MITM subCA 2 issued by Trustwave"
+ "TURKTRUST Mis-issued Intermediate CA 1"
+ "TURKTRUST Mis-issued Intermediate CA 2"
++
++# Blacklist expired certificates that would cause issues
++# See: https://community.letsencrypt.org/t/openssl-client-compatibility-changes-for-let-s-encrypt-certificates/143816
++# See: https://www.agwa.name/blog/post/fixing_the_addtrust_root_expiration
++"DST Root CA X3"
