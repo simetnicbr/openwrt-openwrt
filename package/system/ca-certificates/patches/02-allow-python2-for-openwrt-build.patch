@@ -1,0 +1,19 @@
+--- a/work/mozilla/Makefile
++++ b/work/mozilla/Makefile
+@@ -3,7 +3,7 @@
+ #
+ 
+ all:
+-	python3 certdata2pem.py
++	python certdata2pem.py
+ 
+ clean:
+ 	-rm -f *.crt
+--- a/work/mozilla/certdata2pem.py
++++ b/work/mozilla/certdata2pem.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/python
+ # vim:set et sw=4:
+ #
+ # certdata2pem.py - splits certdata.txt into multiple files
